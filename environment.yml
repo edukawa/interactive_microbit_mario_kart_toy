@@ -1,0 +1,13 @@
+name: lego_mario_test
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+      - bleak==0.21.1
+      - typing-extensions==4.14.1
+      - pyobjc-core==9.2
+      - pyobjc-framework-CoreBluetooth==9.2
+      - pyobjc-framework-libdispatch==9.2
+      - pyobjc-framework-Cocoa==9.2
