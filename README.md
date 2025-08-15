@@ -30,7 +30,10 @@ Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_co
 
 > Notes: Counts are per kart. Colors don’t matter. Equivalent parts are fine.
 
-### Additional LEGO elements (not included in the base set)
+### BrickLink Studio 3D-model
+- I published a modified Kart 3D model on BrickLink. See the full parts list in the: [BrickLink Studio 3D Model](https://www.bricklink.com/v3/studio/design.page?idModel=720622)
+
+### Additional LEGO elements (not included in the base 72043 set)
 
 **Technic gears (blue, used in this build)**
 - 2× `6396479`
