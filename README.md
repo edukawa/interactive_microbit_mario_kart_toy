@@ -13,8 +13,8 @@ Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_co
 
 ---
 
-## 🎯 Features
-- Bluetooth LE bridge from **macOS (Python + Bleak)** to **micro:bit (UART/NUS)**.
+## 🎯 Features and Architecture
+- Bluetooth LE bridge from **macOS (Python + Bleak)** to **micro:bit (UART/NUS)**. Mario sends raw IMU data to Mac OS -> Mac OS Python script is filtering IMU data -> Mac OS Python script sends control commands to the micro:bit.
 - Smooth analog control with continuous **throttle** (−1.0 … +1.0) and **steering** (−1.0 … +1.0).
 - micro:bit v2 **MakeCode** with [WuKong](https://www.elecfreaks.com/learn-en/microbitExtensionModule/wukong.html) motor controller.
 - Tested with **LEGO set 72043**.
@@ -28,7 +28,12 @@ Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_co
 - BBC micro:bit **v2** with [WuKong](https://www.elecfreaks.com/learn-en/microbitExtensionModule/wukong.html) motor driver board
 - Geekservo (aka Geekmotor) — e.g. [KittenBot Red Geekservo](https://www.kittenbot.cc/products/kittenbot-red-geekservo-motor?srsltid=AfmBOooTMd0F47peWlP_WttThHysRFdQFGK_tqafHXt6cpBw5pCdkloi)
 
-> Notes: Counts are per kart. Colors don’t matter. Equivalent parts are fine.
+### Software ###
+- macOS with Bluetooth LE (developed on Apple M1 15.6 Sequoia)
+- Python **3.9+**
+- Bleak **0.21.x**
+
+## 🛠 Build Modified Kart 
 
 ### BrickLink Studio 3D-model
 - I published a modified Kart 3D model on BrickLink. See the full parts list in the: [BrickLink Studio 3D Model](https://www.bricklink.com/v3/studio/design.page?idModel=720622)
@@ -61,26 +66,7 @@ Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_co
 - 2× Rim `55981` (or equivalent)
 
 
-
-### Software ###
-- macOS with Bluetooth LE (developed on Apple M1 15.6 Sequoia)
-- Python **3.9+**
-- Bleak **0.21.x**
-
----
-
-## 📂 Structure
-```
-/bridge
-    mario_bridge.py             # macOS BLE bridge (Mario -> micro:bit)
-    mario_microbit_scan.py      # helper: list BLE devices for sanity check
-/microbit
-    microbit_mario_kart_driver.hex    # MakeCode micro:bit program
-```
-
----
-
-## 🧱 Build Steps for LEGO 72043 set
+### 🧱 Build Steps for LEGO 72043 set
 
 **Step 1 — Modify the rear axle of the kart**
 - Rear axle (rear view): ![Rear axle (rear view)](photos/kart_1.jpg)
@@ -100,7 +86,18 @@ Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_co
 
 ---
 
-## 🚀 Quick Start
+## 📂 Mac Side Software Structure
+```
+/bridge
+    mario_bridge.py             # macOS BLE bridge (Mario -> micro:bit)
+    mario_microbit_scan.py      # helper: list BLE devices for sanity check
+/microbit
+    microbit_mario_kart_driver.hex    # MakeCode micro:bit program
+```
+
+---
+
+## 🚀 Mac Side Software Quick Start
 
 ### 1) Clone the repo
 ```bash
