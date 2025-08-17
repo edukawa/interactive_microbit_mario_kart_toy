@@ -7,6 +7,9 @@ Smooth controls for LEGO Mario Kart using LEGO Mario figure + BBC micro:bit
 ## 📖 About
 This project lets you control a LEGO Mario Kart using LEGO Mario's built‑in IMU and send **smooth throttle/steering** commands to a BBC micro:bit over Bluetooth.
 It started as a toy experiment but evolved into smooth, proportional control that makes driving faster, more precise, and way more fun—especially for kids!
+
+See the step-by-step build on [Hackster](https://www.hackster.io/maxxlife/interactive-micro-bit-rc-kart-bf8e15)
+
 ![Modified Lego Mario Kart](photos/mario_kart_final_2.jpg)
 
 Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_controller)
