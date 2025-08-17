@@ -13,15 +13,55 @@ Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_co
 
 ---
 
-## 🎯 Features and Architecture
+## 🎯 1. Features
 - Bluetooth LE bridge from **macOS (Python + Bleak)** to **micro:bit (UART/NUS)**. Mario sends raw IMU data to Mac OS -> Mac OS Python script is filtering IMU data -> Mac OS Python script sends control commands to the micro:bit.
 - Smooth analog control with continuous **throttle** (−1.0 … +1.0) and **steering** (−1.0 … +1.0).
 - micro:bit v2 **MakeCode** with [WuKong](https://www.elecfreaks.com/learn-en/microbitExtensionModule/wukong.html) motor controller.
 - Tested with **LEGO set 72043**.
 
 ---
+## 2. Architecture Snapshot
+```
++--------------------+      +-------------------------------+      +------------------------+
+|                    |      |                               |      |                        |
+|  LEGO Mario (BLE)  |----->|  macOS Bridge (Python/Bleak)  |----->|  micro:bit (BLE UART)  |
+|  IMU (roll/pitch)  |      |  EMA + bias; map to [-1..1]   |      |  parse "<thr,steer>:"  |
+|  notifications     |      |  stream @ 10 Hz               |      |  mix -> L/R motors      |
++--------------------+      +-------------------------------+      +-----------+------------+
+                                                                                |
+                                                                                v
+                                                                      +----------------------+
+                                                                      |  Motor Driver Board  |
+                                                                      |  (Geekservos L/R)    |
+                                                                      +----------------------+
+```
+### Real-time Transport: ###
+- Mario -> Bridge: BLE GATT notifications (IMU tilt).
+- Bridge -> micro:bit: BLE UART (Nordic UART Service) for low-latency command lines.
+### On-demand Transport: ###
+- Device discovery and reconnect handled by CLI (scan -> connect). Optional local CSV logging for offline analysis.
+### Processing (Bridge): ###
+- Filtering: EMA smoothing + brief startup bias calibration.
+- Shaping: deadzone and exponential (“expo”) response for fine control around center.
+- Mapping: roll/pitch -> continuous throttle/steer in [-1.0 … +1.0].
+- Mixing (on device): throttle/steer -> left/right motor outputs for differential drive.
+### CLI & Protocol ###
+- `python mario_microbit_scan.py` — scan to verify Mario and micro:bit are advertising and reachable.
+- `python mario_bridge.py` `[--x-scale <f>] [--z-scale <f>] [--deadzone <f>] [--expo <f>] [--invert-x] [--invert-z]`— run the BLE bridge, tune sensitivity/feel, and stream commands at 10 Hz.
+- ART line format (Bridge -> micro:bit):
+- Text line: `"<throttle>,<steer>:\n"`
+- Two floats in `[-1.0 … +1.0]`, colon as terminator for safe readLine() parsing.
+- micro:bit app (MakeCode): Enable Bluetooth UART, “No pairing required,” read a line each tick, split, parse, and drive left/right motors.
+### Health & Ops ###
+- Connectivity checks: scan before connect; auto-retry on drop.
+- Safety: deadzone prevents creep at neutral; bounds-clamp commands to `[-1.0 … +1.0]`.
+### Future Hooks ###
+- AI Adaptive curves per driver (learned sensitivity/expo on the bridge).
+- Recording & playback to simulate sessions without hardware attached.
 
-## 🛠 Requirements
+---
+
+## 🛠 3. Requirements
 ### Hardware ###
 - LEGO Mario figure with Bluetooth enabled
 - LEGO Mario Kart 72043 (or your own wheeled LEGO build), it doesn't matter.
@@ -33,7 +73,7 @@ Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_co
 - Python **3.9+**
 - Bleak **0.21.x**
 
-## 🛠 Build Modified Kart 
+## 🛠 4. Build Modified Kart 
 
 ### BrickLink Studio 3D-model
 - I published a modified Kart 3D model on BrickLink. See the full parts list in the: [BrickLink Studio 3D Model](https://www.bricklink.com/v3/studio/design.page?idModel=720622)
@@ -86,7 +126,10 @@ Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_co
 
 ---
 
-## 📂 Mac Side Software Structure
+## 🚀 5. Mac Software Setup
+---
+
+### 📂 Code Structure
 ```
 /bridge
     mario_bridge.py             # macOS BLE bridge (Mario -> micro:bit)
@@ -94,10 +137,6 @@ Inspired by [RickP/lego_mario_controller](https://github.com/RickP/lego_mario_co
 /microbit
     microbit_mario_kart_driver.hex    # MakeCode micro:bit program
 ```
-
----
-
-## 🚀 Mac Side Software Quick Start
 
 ### 1) Clone the repo
 ```bash
@@ -157,7 +196,7 @@ Then drive your Mario Kart with smooth control 🚗💨
 
 ---
 
-## 🎛️ Tuning & Controls
+## 🎛️ 6. Tuning & Controls
 
 The bridge reads Mario IMU (roll -> **x**, pitch -> **z**), smooths via EMA, subtracts a **bias** (captured at startup), then maps to analog outputs.
 
@@ -198,14 +237,14 @@ MakeCode tip: `readLine()`, check it **ends with “:”**, then `split(",")` an
 
 ---
 
-## 🎥 Demo Videos
+## 🎥 7. Demo Videos
 - ✅ Final result — smooth analog control *(if everything is done correctly)*: [Watch on YouTube](https://youtu.be/rKxqxzlykEc?si=mdo-XMajJeAXglYa)
 - 🧪 Early prototype — discrete controls *(kid test, pre-smooth controller)*: [Watch on YouTube](https://youtu.be/yoFcOfaX25s?si=mNUHv1ItuKjsj6jZ)
 
 
 ---
 
-## 🧰 Troubleshooting
+## 🧰 8. Troubleshooting
 - **Mario not found** -> press Mario’s Bluetooth button to (re)advertise.
 - **micro:bit not writable** -> ensure UART (NUS) characteristic is used and not busy.
 - **Kart creeps at rest** -> increase `--deadzone` or hold Mario steadier during startup.
@@ -213,5 +252,5 @@ MakeCode tip: `readLine()`, check it **ends with “:”**, then `split(",")` an
 
 ---
 
-## 📜 License
+## 📜 9. License
 MIT License – free to use, share, and modify.
